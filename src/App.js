@@ -23,7 +23,7 @@ const App = () => {
   }, [] )
 
   useEffect(() => {
-    setPlaces(coordinates, bounds);
+    console.log(coordinates, bounds);
 
     getPlacesData()
       .then((data) => {
