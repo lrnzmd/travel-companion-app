@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 
 import { CssBaseline, Grid } from '@material-ui/core'
 
-import { getPlacesData } from './api'
+import { getPlacesData, getWeatherData } from './api'
 
 import Header from './components/Header/Header'
 import List from './components/List/List'
@@ -18,11 +18,18 @@ const App = () => {
   const [childClicked, setChildClicked] = useState(null)
 
   const [coordinates, setCoordinates] = useState({})
+
   const [bounds, setBounds] = useState({})
 
+  const [autocomplete, setAutocomplete] = useState(null)
+
   const [isLoading, setIsLoading] = useState(false)
+
   const [type, setType] = useState('restaurants')
+
   const [rating, setRating] = useState('')
+
+  const [weatherData, setWeatherData] = useState([]);
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(({ coords: { latitude, longitude } }) => {
@@ -38,7 +45,10 @@ const App = () => {
   useEffect(() => {
     if(bounds.sw && bounds.ne) {
       setIsLoading(true)
-  
+
+      getWeatherData(coordinates.lat, coordinates.lng)
+        .then((data) => setWeatherData(data));
+
       getPlacesData(type, bounds.sw, bounds.ne)
         .then((data) => {
           setPlaces(data?.filter((place) => place.name && place.num_reviews > 0));
@@ -48,9 +58,6 @@ const App = () => {
     }
       
   }, [type, bounds])
-
-  const [autocomplete, setAutocomplete] = useState(null)
-    
 
   const onLoad = (autoC) => { setAutocomplete(autoC) }
 
@@ -85,6 +92,7 @@ const App = () => {
             coordinates={coordinates}
             places={filteredPlaces.length ? filteredPlaces : places}
             setChildClicked={setChildClicked}
+            weatherData={weatherData}
           />
         </Grid>
       </Grid>
