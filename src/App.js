@@ -18,7 +18,7 @@ const App = () => {
   const [childClicked, setChildClicked] = useState(null)
 
   const [coordinates, setCoordinates] = useState({})
-  const [bounds, setBounds] = useState({ sw: 0, ne: 0 })
+  const [bounds, setBounds] = useState({})
 
   const [isLoading, setIsLoading] = useState(false)
   const [type, setType] = useState('restaurants')
@@ -36,16 +36,18 @@ const App = () => {
   }, [rating])
 
   useEffect(() => {
-    setIsLoading(true)
-
-    getPlacesData(type, bounds.sw, bounds.ne)
-      .then((data) => {
-        setPlaces(data);
-        setFilteredPlaces([])
-        setIsLoading(false)
-      }
-      )
-  }, [type, coordinates, bounds])
+    if(bounds.sw && bounds.ne) {
+      setIsLoading(true)
+  
+      getPlacesData(type, bounds.sw, bounds.ne)
+        .then((data) => {
+          setPlaces(data?.filter((place) => place.name && place.num_reviews > 0));
+          setFilteredPlaces([])
+          setIsLoading(false)
+        })
+    }
+      
+  }, [type, bounds])
 
   const [autocomplete, setAutocomplete] = useState(null)
     
